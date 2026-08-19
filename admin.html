@@ -3,909 +3,912 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Happiness Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: Arial, "Noto Sans Bengali", sans-serif;
-      background: #f7f4f1;
-      color: #2f2440;
-      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #222;
     }
 
     .container {
-      width: min(1100px, 92%);
+      max-width: 1000px;
       margin: auto;
-    }
-
-    header {
-      background: #352348;
-      color: white;
-      padding: 18px 0;
-    }
-
-    .header-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 25px;
-      font-weight: 800;
-    }
-
-    .logo span {
-      color: #f1844d;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .logout {
-      background: #f1844d;
-      color: white;
-      padding: 10px 17px;
-      border-radius: 20px;
-    }
-
-    main {
-      padding: 40px 0;
-    }
-
-    .login-box,
-    .dashboard {
-      max-width: 850px;
-      margin: auto;
-    }
-
-    .box {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.06);
-      margin-bottom: 25px;
+      padding: 25px;
     }
 
     h1 {
-      margin-bottom: 10px;
+      margin-top: 0;
     }
 
-    h2 {
+    .card {
+      background: white;
+      padding: 25px;
       margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin: 15px 0 7px;
-      font-weight: 700;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
     }
 
     input,
     textarea,
     select {
       width: 100%;
-      padding: 13px;
-      border: 1px solid #ddd4cc;
-      border-radius: 10px;
-      outline: none;
+      padding: 12px;
+      margin-top: 7px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
       font-size: 15px;
     }
 
     textarea {
-      min-height: 160px;
+      min-height: 180px;
       resize: vertical;
     }
 
-    .primary {
-      background: #352348;
-      color: white;
-      padding: 13px 22px;
-      border-radius: 10px;
-      margin-top: 18px;
+    button {
+      border: 0;
+      padding: 11px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-right: 7px;
+      margin-bottom: 7px;
     }
 
-    .primary:hover {
-      background: #f1844d;
+    .primary {
+      background: #16803c;
+      color: white;
+    }
+
+    .danger {
+      background: #d93025;
+      color: white;
+    }
+
+    .secondary {
+      background: #e8edf3;
+      color: #222;
     }
 
     .hidden {
-      display: none !important;
-    }
-
-    .message {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #f3eee9;
-    }
-
-    .content-list {
-      display: grid;
-      gap: 12px;
+      display: none;
     }
 
     .content-item {
-      border: 1px solid #e5ddd6;
-      border-radius: 14px;
-      padding: 17px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
+      border: 1px solid #ddd;
+      padding: 18px;
+      border-radius: 10px;
+      margin-top: 15px;
     }
 
-    .content-item h3 {
-      margin-bottom: 4px;
-    }
-
-    .content-item p {
-      color: #766d78;
-      font-size: 14px;
-    }
-
-    .delete {
-      background: #c0392b;
-      color: white;
-      padding: 8px 13px;
+    .content-item img,
+    .content-item video {
+      max-width: 100%;
+      max-height: 300px;
+      margin-top: 10px;
       border-radius: 8px;
     }
 
     .status {
-      padding: 10px;
-      border-radius: 10px;
-      background: #eee8f4;
-      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background: #eef5ff;
     }
 
-    @media(max-width:650px) {
-      .content-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    .error {
+      background: #ffecec;
+      color: #a40000;
+    }
+
+    .success {
+      background: #eaffef;
+      color: #08752c;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    label {
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  <div class="container header-inner">
-    <div class="logo">Happiness<span> ♥</span></div>
-    <button id="logoutBtn" class="logout hidden">Logout</button>
-  </div>
-</header>
-
-<main class="container">
+<div class="container">
 
   <!-- LOGIN -->
-  <section id="loginSection" class="login-box">
+  <div id="loginSection" class="card">
 
-    <div class="box">
+    <h1>🔐 Happiness Admin</h1>
 
-      <h1>🔐 Admin Login</h1>
+    <p>Admin account দিয়ে login করুন।</p>
 
-      <p>Happiness website পরিচালনা করতে login করুন।</p>
+    <div id="loginMessage"></div>
 
-      <label>Email</label>
-      <input
-        id="email"
-        type="email"
-        placeholder="আপনার admin email">
+    <label>Email</label>
+    <input
+      id="email"
+      type="email"
+      placeholder="আপনার email"
+    >
 
-      <label>Password</label>
-      <input
-        id="password"
-        type="password"
-        placeholder="আপনার password">
+    <label>Password</label>
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
 
-      <button id="loginBtn" class="primary">
-        Login
-      </button>
+    <button class="primary" onclick="login()">
+      Login
+    </button>
 
-      <div id="loginMessage" class="message hidden"></div>
-
-    </div>
-
-  </section>
+  </div>
 
 
-  <!-- DASHBOARD -->
-  <section id="dashboardSection" class="dashboard hidden">
+  <!-- ADMIN PANEL -->
+  <div id="adminSection" class="hidden">
 
-    <div class="box">
+    <div class="card">
 
-      <h1>📊 Happiness Dashboard</h1>
+      <div class="topbar">
 
-      <p>
-        এখান থেকে আপনার website-এর content পরিচালনা করুন।
-      </p>
+        <div>
+          <h1>🎛️ Happiness Admin Panel</h1>
+          <div id="userEmail"></div>
+        </div>
 
-      <div id="status" class="status"></div>
+        <button class="danger" onclick="logout()">
+          Logout
+        </button>
+
+      </div>
 
     </div>
 
 
     <!-- ADD CONTENT -->
-
-    <div class="box">
+    <div class="card">
 
       <h2>➕ নতুন Content যোগ করুন</h2>
 
-      <label>Content Type</label>
-
-      <select id="contentType">
-        <option value="story">📖 গল্প</option>
-        <option value="image">🖼️ ছবি</option>
-        <option value="video">🎬 ভিডিও</option>
-      </select>
-
+      <div id="uploadMessage"></div>
 
       <label>Title</label>
 
       <input
         id="title"
         type="text"
-        placeholder="শিরোনাম লিখুন">
+        placeholder="গল্প/ছবি/ভিডিওর title"
+      >
 
 
-      <label>Description</label>
+      <label>Type</label>
+
+      <select id="type">
+
+        <option value="story">
+          📖 Story
+        </option>
+
+        <option value="image">
+          🖼️ Image
+        </option>
+
+        <option value="video">
+          🎬 Video
+        </option>
+
+      </select>
+
+
+      <label>Story / Description</label>
 
       <textarea
-        id="description"
-        placeholder="সংক্ষিপ্ত description"></textarea>
+        id="body"
+        placeholder="গল্প বা description লিখুন..."
+      ></textarea>
 
 
-      <div id="storyContentBox">
+      <label>ছবি / ভিডিও নির্বাচন করুন</label>
 
-        <label>গল্পের সম্পূর্ণ লেখা</label>
-
-        <textarea
-          id="storyContent"
-          placeholder="এখানে সম্পূর্ণ গল্প লিখুন"></textarea>
-
-      </div>
+      <input
+        id="mediaFile"
+        type="file"
+        accept="image/*,video/*"
+      >
 
 
-      <div id="mediaBox">
-
-        <label>File</label>
-
-        <input
-          id="mediaFile"
-          type="file"
-          accept="image/jpeg,image/png,image/webp,video/mp4,video/webm">
-
-      </div>
-
-
-      <button id="addBtn" class="primary">
-        Publish Content
+      <button
+        class="primary"
+        onclick="addContent()"
+      >
+        🚀 Publish
       </button>
-
-      <div id="addMessage" class="message hidden"></div>
 
     </div>
 
 
     <!-- CONTENT LIST -->
+    <div class="card">
 
-    <div class="box">
+      <div class="topbar">
 
-      <h2>📚 আপনার Content</h2>
+        <h2>📚 Website Content</h2>
 
-      <div
-        id="contentList"
-        class="content-list">
+        <button
+          class="secondary"
+          onclick="loadContent()"
+        >
+          🔄 Refresh
+        </button>
+
+      </div>
+
+      <div id="contentList">
+        Loading...
       </div>
 
     </div>
 
-  </section>
+  </div>
 
-</main>
-
-
-<script type="module">
-
-/*
-  ========================================
-  SUPABASE CONFIG
-  ========================================
-
-  এখানে শুধু আপনার Project URL এবং
-  Publishable key বসাবেন।
-
-  SECRET KEY কখনো এখানে বসাবেন না।
-*/
-
-const SUPABASE_URL =
-  "oiniltywzwbaqofwpthh";
-
-const SUPABASE_KEY =
-  "sb_publishable_4BCNssgCe-383Hzv9sWwFg_W-UkPxQs";
+</div>
 
 
-import {
-  createClient
-} from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+<script>
+
+  /*
+   =====================================================
+   SUPABASE CONFIG
+   =====================================================
+
+   এখানে শুধু আপনার Publishable key ব্যবহার করবেন।
+
+   Secret key (sb_secret_...) কখনো এখানে দেবেন না।
+  */
+
+  const SUPABASE_URL =
+    "https://oiniltywzwbaqofwpthh.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_4BCNssgCe-383Hzv9sWwFg_W-UkPxQs";
 
 
-const supabase =
-  createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-/* ELEMENTS */
-
-const loginSection =
-  document.getElementById("loginSection");
-
-const dashboardSection =
-  document.getElementById("dashboardSection");
-
-const logoutBtn =
-  document.getElementById("logoutBtn");
-
-const loginBtn =
-  document.getElementById("loginBtn");
-
-const addBtn =
-  document.getElementById("addBtn");
-
-const loginMessage =
-  document.getElementById("loginMessage");
-
-const addMessage =
-  document.getElementById("addMessage");
-
-const status =
-  document.getElementById("status");
-
-const contentList =
-  document.getElementById("contentList");
-
-const contentType =
-  document.getElementById("contentType");
-
-const storyContentBox =
-  document.getElementById("storyContentBox");
-
-const mediaBox =
-  document.getElementById("mediaBox");
-
-
-/* LOGIN */
-
-loginBtn.addEventListener("click", async () => {
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-
-  if (!email || !password) {
-
-    showMessage(
-      loginMessage,
-      "Email এবং password দিন।"
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
     );
 
-    return;
-  }
+
+  /*
+   =====================================================
+   LOGIN
+   =====================================================
+  */
+
+  async function login() {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
 
 
-  loginBtn.disabled = true;
+    if (!email || !password) {
 
-  loginBtn.textContent = "Login হচ্ছে...";
+      showMessage(
+        "loginMessage",
+        "Email এবং password দিন।",
+        "error"
+      );
 
-
-  const {
-    error
-  } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-
-  loginBtn.disabled = false;
-
-  loginBtn.textContent = "Login";
-
-
-  if (error) {
-
-    showMessage(
-      loginMessage,
-      "Login failed: " + error.message
-    );
-
-    return;
-  }
-
-
-  await showDashboard();
-
-});
-
-
-/* LOGOUT */
-
-logoutBtn.addEventListener("click", async () => {
-
-  await supabase.auth.signOut();
-
-  location.reload();
-
-});
-
-
-/* TYPE CHANGE */
-
-contentType.addEventListener(
-  "change",
-  updateContentForm
-);
-
-
-function updateContentForm() {
-
-  const type =
-    contentType.value;
-
-
-  if (type === "story") {
-
-    storyContentBox.classList.remove("hidden");
-
-    mediaBox.classList.add("hidden");
-
-  } else {
-
-    storyContentBox.classList.add("hidden");
-
-    mediaBox.classList.remove("hidden");
-
-  }
-
-}
-
-
-updateContentForm();
-
-
-/* ADD CONTENT */
-
-addBtn.addEventListener(
-  "click",
-  addContent
-);
-
-
-async function addContent() {
-
-  const title =
-    document.getElementById("title")
-      .value.trim();
-
-  const description =
-    document.getElementById("description")
-      .value.trim();
-
-  const type =
-    contentType.value;
-
-
-  if (!title) {
-
-    showMessage(
-      addMessage,
-      "Title লিখুন।"
-    );
-
-    return;
-  }
-
-
-  addBtn.disabled = true;
-
-  addBtn.textContent =
-    "Publish হচ্ছে...";
-
-
-  try {
-
-    let fileUrl = null;
-
-    let storyText = null;
-
-
-    /* STORY */
-
-    if (type === "story") {
-
-      storyText =
-        document.getElementById("storyContent")
-          .value.trim();
-
+      return;
     }
 
 
-    /* IMAGE / VIDEO */
-
-    if (
-      type === "image" ||
-      type === "video"
-    ) {
-
-      const file =
-        document.getElementById("mediaFile")
-          .files[0];
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
 
 
-      if (!file) {
+    if (error) {
 
-        throw new Error(
-          "একটি file নির্বাচন করুন।"
-        );
+      showMessage(
+        "loginMessage",
+        "Login failed: " + error.message,
+        "error"
+      );
 
-      }
+      return;
+    }
 
 
-      const maxSize =
-        50 * 1024 * 1024;
+    showAdmin(data.user);
+
+  }
 
 
-      if (file.size > maxSize) {
+  /*
+   =====================================================
+   LOGOUT
+   =====================================================
+  */
 
-        throw new Error(
-          "File 50 MB-এর বেশি হতে পারবে না।"
-        );
+  async function logout() {
 
-      }
+    await supabaseClient.auth.signOut();
 
+    document
+      .getElementById("adminSection")
+      .classList.add("hidden");
+
+    document
+      .getElementById("loginSection")
+      .classList.remove("hidden");
+
+  }
+
+
+  /*
+   =====================================================
+   SHOW ADMIN
+   =====================================================
+  */
+
+  function showAdmin(user) {
+
+    document
+      .getElementById("loginSection")
+      .classList.add("hidden");
+
+    document
+      .getElementById("adminSection")
+      .classList.remove("hidden");
+
+
+    document
+      .getElementById("userEmail")
+      .innerText =
+      "Logged in: " + user.email;
+
+
+    loadContent();
+
+  }
+
+
+  /*
+   =====================================================
+   ADD CONTENT
+   =====================================================
+  */
+
+  async function addContent() {
+
+    const title =
+      document.getElementById("title")
+        .value.trim();
+
+    const type =
+      document.getElementById("type")
+        .value;
+
+    const body =
+      document.getElementById("body")
+        .value.trim();
+
+    const file =
+      document.getElementById("mediaFile")
+        .files[0];
+
+
+    if (!title) {
+
+      showMessage(
+        "uploadMessage",
+        "Title দিন।",
+        "error"
+      );
+
+      return;
+    }
+
+
+    /*
+      Story হলে file optional।
+      Image / Video হলে file প্রয়োজন।
+    */
+
+    if ((type === "image" || type === "video") && !file) {
+
+      showMessage(
+        "uploadMessage",
+        "Image অথবা Video নির্বাচন করুন।",
+        "error"
+      );
+
+      return;
+    }
+
+
+    let mediaPath = null;
+
+
+    /*
+     ===================================================
+     FILE UPLOAD
+     ===================================================
+    */
+
+    if (file) {
+
+      const fileExtension =
+        file.name.split(".").pop();
+
+      const safeName =
+        file.name
+          .replace(/[^a-zA-Z0-9._-]/g, "_");
 
       const fileName =
         Date.now() +
-        "-" +
-        file.name
-          .replace(/[^a-zA-Z0-9._-]/g, "-");
+        "_" +
+        safeName;
 
 
       const filePath =
-        type +
-        "/" +
         fileName;
 
 
-      const {
-        error: uploadError
-      } = await supabase.storage
-        .from("media")
-        .upload(
-          filePath,
-          file,
-          {
+      const { error: uploadError } =
+        await supabaseClient.storage
+          .from("media")
+          .upload(filePath, file, {
             cacheControl: "3600",
             upsert: false
-          }
-        );
+          });
 
 
       if (uploadError) {
 
-        throw uploadError;
-
-      }
-
-
-      /*
-        Public bucket OFF থাকলে
-        temporary signed URL তৈরি করা হবে।
-      */
-
-      const {
-        data: signedData,
-        error: signedError
-      } = await supabase.storage
-        .from("media")
-        .createSignedUrl(
-          filePath,
-          60 * 60 * 24 * 365
+        showMessage(
+          "uploadMessage",
+          "File upload failed: " +
+          uploadError.message,
+          "error"
         );
 
-
-      if (signedError) {
-
-        throw signedError;
-
+        return;
       }
 
 
-      fileUrl =
-        signedData.signedUrl;
+      mediaPath = filePath;
 
     }
 
 
-    /* DATABASE */
+    /*
+     ===================================================
+     DATABASE INSERT
+     ===================================================
+    */
 
-    const {
-      error: dbError
-    } = await supabase
-      .from("content")
-      .insert({
+    const { error: dbError } =
+      await supabaseClient
+        .from("content")
+        .insert({
 
-        title,
+          title: title,
 
-        description,
+          type: type,
 
-        content_type: type,
+          body: body || null,
 
-        body: storyText,
+          media_path: mediaPath,
 
-        file_url: fileUrl,
+          published: true
 
-        published: true
-
-      });
+        });
 
 
     if (dbError) {
 
-      throw dbError;
+      /*
+        Database insert failed হলে
+        uploaded file delete করার চেষ্টা
+      */
+
+      if (mediaPath) {
+
+        await supabaseClient
+          .storage
+          .from("media")
+          .remove([mediaPath]);
+
+      }
+
+
+      showMessage(
+        "uploadMessage",
+        "Database error: " +
+        dbError.message,
+        "error"
+      );
+
+      return;
+    }
+
+
+    /*
+     ===================================================
+     SUCCESS
+     ===================================================
+    */
+
+    showMessage(
+      "uploadMessage",
+      "✅ Content successfully published!",
+      "success"
+    );
+
+
+    document.getElementById("title").value = "";
+    document.getElementById("body").value = "";
+    document.getElementById("mediaFile").value = "";
+
+
+    loadContent();
+
+  }
+
+
+  /*
+   =====================================================
+   LOAD CONTENT
+   =====================================================
+  */
+
+  async function loadContent() {
+
+    const list =
+      document.getElementById("contentList");
+
+
+    list.innerHTML = "Loading...";
+
+
+    const { data, error } =
+      await supabaseClient
+        .from("content")
+        .select("*")
+        .order("created_at", {
+          ascending: false
+        });
+
+
+    if (error) {
+
+      list.innerHTML =
+        `<div class="status error">
+          ${escapeHtml(error.message)}
+        </div>`;
+
+      return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        `<div class="status">
+          এখনো কোনো content নেই।
+        </div>`;
+
+      return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    data.forEach(item => {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "content-item";
+
+
+      let mediaHTML = "";
+
+
+      /*
+       =================================================
+       PUBLIC FILE URL
+       =================================================
+      */
+
+      if (item.media_path) {
+
+        const { data: publicData } =
+          supabaseClient.storage
+            .from("media")
+            .getPublicUrl(item.media_path);
+
+
+        const url =
+          publicData.publicUrl;
+
+
+        if (item.type === "image") {
+
+          mediaHTML =
+            `<img
+              src="${url}"
+              alt=""
+            >`;
+
+        }
+
+
+        if (item.type === "video") {
+
+          mediaHTML =
+            `<video
+              controls
+              src="${url}"
+            ></video>`;
+
+        }
+
+      }
+
+
+      div.innerHTML = `
+
+        <h3>
+          ${escapeHtml(item.title)}
+        </h3>
+
+        <p>
+          <strong>Type:</strong>
+          ${escapeHtml(item.type)}
+        </p>
+
+        <p>
+          ${escapeHtml(item.body || "")}
+        </p>
+
+        ${mediaHTML}
+
+        <p>
+          <strong>Status:</strong>
+          ${item.published ? "🟢 Published" : "🔴 Unpublished"}
+        </p>
+
+        <button
+          class="secondary"
+          onclick="togglePublish(${item.id}, ${item.published})"
+        >
+          ${item.published ? "Unpublish" : "Publish"}
+        </button>
+
+        <button
+          class="danger"
+          onclick="deleteContent(${item.id}, '${escapeJs(item.media_path || "")}')"
+        >
+          🗑️ Delete
+        </button>
+
+      `;
+
+
+      list.appendChild(div);
+
+    });
+
+  }
+
+
+  /*
+   =====================================================
+   PUBLISH / UNPUBLISH
+   =====================================================
+  */
+
+  async function togglePublish(id, currentStatus) {
+
+    const { error } =
+      await supabaseClient
+        .from("content")
+        .update({
+          published: !currentStatus
+        })
+        .eq("id", id);
+
+
+    if (error) {
+
+      alert(
+        "Update failed: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    loadContent();
+
+  }
+
+
+  /*
+   =====================================================
+   DELETE
+   =====================================================
+  */
+
+  async function deleteContent(id, mediaPath) {
+
+    const ok =
+      confirm(
+        "এই content সত্যিই delete করতে চান?"
+      );
+
+
+    if (!ok) return;
+
+
+    /*
+      Database থেকে delete
+    */
+
+    const { error } =
+      await supabaseClient
+        .from("content")
+        .delete()
+        .eq("id", id);
+
+
+    if (error) {
+
+      alert(
+        "Delete failed: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    /*
+      Storage file delete
+    */
+
+    if (mediaPath) {
+
+      await supabaseClient
+        .storage
+        .from("media")
+        .remove([mediaPath]);
 
     }
 
 
-    showMessage(
-      addMessage,
-      "✅ Content সফলভাবে Publish হয়েছে!"
-    );
-
-
-    document
-      .getElementById("title")
-      .value = "";
-
-    document
-      .getElementById("description")
-      .value = "";
-
-    document
-      .getElementById("storyContent")
-      .value = "";
-
-    document
-      .getElementById("mediaFile")
-      .value = "";
-
-
-    await loadContent();
-
-
-  } catch (error) {
-
-    showMessage(
-      addMessage,
-      "❌ Error: " + error.message
-    );
+    loadContent();
 
   }
 
 
-  addBtn.disabled = false;
+  /*
+   =====================================================
+   CHECK EXISTING LOGIN
+   =====================================================
+  */
 
-  addBtn.textContent =
-    "Publish Content";
+  async function checkSession() {
 
-}
-
-
-/* LOAD CONTENT */
-
-async function loadContent() {
-
-  const {
-    data,
-    error
-  } = await supabase
-    .from("content")
-    .select("*")
-    .order(
-      "created_at",
-      {
-        ascending: false
+    const {
+      data: {
+        session
       }
-    );
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
 
 
-  if (error) {
+    if (session && session.user) {
 
-    contentList.innerHTML =
-      "<p>Content load করতে সমস্যা হয়েছে।</p>";
+      showAdmin(session.user);
 
-    return;
-
-  }
-
-
-  contentList.innerHTML = "";
-
-
-  if (!data.length) {
-
-    contentList.innerHTML =
-      "<p>এখনও কোনো content নেই।</p>";
-
-    return;
+    }
 
   }
 
 
-  data.forEach(item => {
+  /*
+   =====================================================
+   MESSAGE
+   =====================================================
+  */
 
-    const div =
-      document.createElement("div");
-
-    div.className =
-      "content-item";
-
-
-    div.innerHTML = `
-
-      <div>
-
-        <h3>
-          ${escapeHTML(item.title)}
-        </h3>
-
-        <p>
-          ${item.content_type}
-          —
-          ${escapeHTML(item.description || "")}
-        </p>
-
-      </div>
-
-      <button
-        class="delete"
-        data-id="${item.id}">
-        Delete
-      </button>
-
-    `;
-
-
-    div
-      .querySelector(".delete")
-      .addEventListener(
-        "click",
-        () => deleteContent(item.id)
-      );
-
-
-    contentList.appendChild(div);
-
-  });
-
-}
-
-
-/* DELETE */
-
-async function deleteContent(id) {
-
-  if (
-    !confirm(
-      "এই content delete করতে চান?"
-    )
+  function showMessage(
+    elementId,
+    message,
+    type
   ) {
 
-    return;
+    const element =
+      document.getElementById(elementId);
+
+
+    element.innerHTML =
+      `<div class="status ${type}">
+        ${escapeHtml(message)}
+      </div>`;
 
   }
 
 
-  const {
-    error
-  } = await supabase
-    .from("content")
-    .delete()
-    .eq("id", id);
+  /*
+   =====================================================
+   SECURITY HELPERS
+   =====================================================
+  */
 
+  function escapeHtml(value) {
 
-  if (error) {
-
-    alert(
-      "Delete failed: " +
-      error.message
-    );
-
-    return;
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 
   }
 
 
-  await loadContent();
+  function escapeJs(value) {
 
-}
+    return String(value)
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'");
 
-
-/* DASHBOARD */
-
-async function showDashboard() {
-
-  loginSection.classList.add("hidden");
-
-  dashboardSection.classList.remove("hidden");
-
-  logoutBtn.classList.remove("hidden");
-
-  status.textContent =
-    "আপনি Admin হিসেবে login করেছেন।";
-
-  await loadContent();
-
-}
-
-
-/* SESSION */
-
-const {
-  data: {
-    session
   }
-} = await supabase.auth.getSession();
 
 
-if (session) {
+  /*
+   =====================================================
+   START
+   =====================================================
+  */
 
-  await showDashboard();
-
-}
-
-
-/* HELPERS */
-
-function showMessage(
-  element,
-  message
-) {
-
-  element.textContent =
-    message;
-
-  element.classList.remove(
-    "hidden"
-  );
-
-}
-
-
-function escapeHTML(value) {
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
+  checkSession();
 
 </script>
 
