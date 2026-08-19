@@ -161,6 +161,7 @@ section{
 
 .card p{
   color:#746b77;
+  white-space:pre-line;
 }
 
 .story{
@@ -172,10 +173,11 @@ section{
   padding:0;
 }
 
-.video iframe{
+.video video{
   width:100%;
   aspect-ratio:16/9;
-  border:0;
+  display:block;
+  background:#000;
 }
 
 .video-content{
@@ -220,6 +222,20 @@ footer p{
   color:#756b76;
 }
 
+.loading{
+  background:#f4eee9;
+  border-radius:20px;
+  padding:30px;
+  color:#756b76;
+}
+
+.error{
+  background:#ffe8e8;
+  border-radius:20px;
+  padding:30px;
+  color:#a00000;
+}
+
 @media(max-width:800px){
 
   .hero{
@@ -249,6 +265,7 @@ footer p{
 <body>
 
 <header>
+
   <div class="nav">
 
     <div class="logo">
@@ -264,6 +281,7 @@ footer p{
     </nav>
 
   </div>
+
 </header>
 
 
@@ -273,7 +291,9 @@ footer p{
 
   <div>
 
-    <div class="badge">ভালো থাকার ছোট্ট ঠিকানা</div>
+    <div class="badge">
+      ভালো থাকার ছোট্ট ঠিকানা
+    </div>
 
     <h1>
       একটু হাসি,<br>
@@ -286,6 +306,7 @@ footer p{
     </p>
 
   </div>
+
 
   <div class="hero-card">
 
@@ -307,11 +328,22 @@ footer p{
 <section id="stories">
 
   <div class="section-title">
+
     <small>READ & FEEL</small>
+
     <h2>📖 গল্প</h2>
+
   </div>
 
-  <div class="grid" id="stories-container"></div>
+  <div
+    class="grid"
+    id="stories-container">
+
+    <div class="loading">
+      গল্পগুলো লোড হচ্ছে...
+    </div>
+
+  </div>
 
 </section>
 
@@ -321,11 +353,22 @@ footer p{
 <section id="videos">
 
   <div class="section-title">
+
     <small>WATCH</small>
+
     <h2>🎬 ভিডিও</h2>
+
   </div>
 
-  <div class="grid" id="videos-container"></div>
+  <div
+    class="grid"
+    id="videos-container">
+
+    <div class="loading">
+      ভিডিওগুলো লোড হচ্ছে...
+    </div>
+
+  </div>
 
 </section>
 
@@ -335,11 +378,22 @@ footer p{
 <section id="gallery">
 
   <div class="section-title">
+
     <small>MEMORIES</small>
+
     <h2>🖼️ ছবি</h2>
+
   </div>
 
-  <div class="grid" id="gallery-container"></div>
+  <div
+    class="grid"
+    id="gallery-container">
+
+    <div class="loading">
+      ছবিগুলো লোড হচ্ছে...
+    </div>
+
+  </div>
 
 </section>
 
@@ -349,11 +403,23 @@ footer p{
 <section id="quotes">
 
   <div class="section-title">
+
     <small>GOOD THOUGHTS</small>
+
     <h2>💭 ভালো লাগার কথা</h2>
+
   </div>
 
-  <div class="grid" id="quotes-container"></div>
+  <div
+    class="grid"
+    id="quotes-container">
+
+    <div class="empty">
+      ভালো কথাগুলো Admin Panel থেকে
+      গল্প হিসেবে যোগ করতে পারবে।
+    </div>
+
+  </div>
 
 </section>
 
@@ -375,231 +441,498 @@ footer p{
 </footer>
 
 
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
 <script>
+
+/*
+====================================================
+SUPABASE SETTINGS
+====================================================
+*/
+
+const SUPABASE_URL =
+  "https://oiniltywzwbaqofwpthh.supabase.co";
+
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_4BCNssgCe-383Hzv9sWwFg_W-UkPxQs";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/*
+====================================================
+STORAGE
+====================================================
+*/
+
+const STORAGE_BUCKET = "media";
+
+
+/*
+====================================================
+LOAD CONTENT
+====================================================
+*/
 
 async function loadContent(){
 
   try{
 
-    const response = await fetch("content.json");
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("content")
+      .select("*")
+      .eq("published", true)
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
 
-    const data = await response.json();
 
+    if(error){
 
-    /* SITE */
-
-    if(data.site){
-
-      document.title =
-        data.site.name + " — " + data.site.tagline;
-
-      const tagline =
-        document.getElementById("tagline");
-
-      if(data.site.tagline){
-
-        tagline.textContent =
-          data.site.tagline;
-
-      }
+      throw error;
 
     }
 
 
-    /* STORIES */
-
     const stories =
-      document.getElementById("stories-container");
+      document.getElementById(
+        "stories-container"
+      );
 
-    if(data.stories && data.stories.length){
 
-      data.stories.forEach(story => {
+    const videos =
+      document.getElementById(
+        "videos-container"
+      );
 
-        const card =
-          document.createElement("article");
 
-        card.className =
-          "card story";
+    const gallery =
+      document.getElementById(
+        "gallery-container"
+      );
 
-        card.innerHTML = `
-          <h3>${story.title || "গল্প"}</h3>
 
-          <p>
-            ${story.description || ""}
-          </p>
+    const quotes =
+      document.getElementById(
+        "quotes-container"
+      );
 
-          <br>
 
-          <p>
-            ${story.content || ""}
-          </p>
-        `;
+    stories.innerHTML = "";
 
-        stories.appendChild(card);
+    videos.innerHTML = "";
 
-      });
+    gallery.innerHTML = "";
 
-    }else{
+    quotes.innerHTML = "";
+
+
+    /*
+    ================================================
+    STORIES
+    ================================================
+    */
+
+    const storyData =
+      data.filter(
+        item =>
+          item.type === "story"
+      );
+
+
+    if(
+      storyData.length === 0
+    ){
 
       stories.innerHTML =
         '<div class="empty">এখনও কোনো গল্প যোগ করা হয়নি।</div>';
 
-    }
-
-
-    /* VIDEOS */
-
-    const videos =
-      document.getElementById("videos-container");
-
-    if(data.videos && data.videos.length){
-
-      data.videos.forEach(video => {
-
-        const card =
-          document.createElement("article");
-
-        card.className =
-          "card video";
-
-        let videoHTML = "";
-
-        if(video.url){
-
-          videoHTML = `
-            <iframe
-              src="${video.url}"
-              allowfullscreen>
-            </iframe>
-          `;
-
-        }else{
-
-          videoHTML = `
-            <div style="
-              padding:45px 20px;
-              text-align:center;
-              background:#f4eee9;
-              font-size:45px;">
-              ▶️
-            </div>
-          `;
-
-        }
-
-        card.innerHTML = `
-          ${videoHTML}
-
-          <div class="video-content">
-
-            <h3>${video.title || "ভিডিও"}</h3>
-
-            <p>${video.description || ""}</p>
-
-          </div>
-        `;
-
-        videos.appendChild(card);
-
-      });
-
     }else{
 
-      videos.innerHTML =
-        '<div class="empty">এখনও কোনো ভিডিও যোগ করা হয়নি।</div>';
+      storyData.forEach(
+        story => {
+
+          const card =
+            document.createElement(
+              "article"
+            );
+
+
+          card.className =
+            "card story";
+
+
+          card.innerHTML = `
+
+            <h3>
+              ${escapeHTML(
+                story.title || "গল্প"
+              )}
+            </h3>
+
+            <p>
+              ${escapeHTML(
+                story.body || ""
+              )}
+            </p>
+
+          `;
+
+
+          stories.appendChild(
+            card
+          );
+
+        }
+      );
 
     }
 
 
-    /* GALLERY */
+    /*
+    ================================================
+    IMAGE
+    ================================================
+    */
 
-    const gallery =
-      document.getElementById("gallery-container");
+    const imageData =
+      data.filter(
+        item =>
+          item.type === "image"
+      );
 
-    if(data.gallery && data.gallery.length){
 
-      data.gallery.forEach(item => {
-
-        const card =
-          document.createElement("article");
-
-        card.className =
-          "card gallery";
-
-        if(item.image){
-
-          card.innerHTML = `
-            <img
-              src="${item.image}"
-              alt="${item.title || "Happiness"}">
-
-            <h3 style="margin-top:15px">
-              ${item.title || ""}
-            </h3>
-          `;
-
-        }else{
-
-          card.innerHTML = `
-            <div class="empty">
-              🖼️ ছবি যোগ করা হয়নি
-            </div>
-
-            <h3 style="margin-top:15px">
-              ${item.title || ""}
-            </h3>
-          `;
-
-        }
-
-        gallery.appendChild(card);
-
-      });
-
-    }else{
+    if(
+      imageData.length === 0
+    ){
 
       gallery.innerHTML =
         '<div class="empty">এখনও কোনো ছবি যোগ করা হয়নি।</div>';
 
+    }else{
+
+      imageData.forEach(
+        item => {
+
+          const card =
+            document.createElement(
+              "article"
+            );
+
+
+          card.className =
+            "card gallery";
+
+
+          let imageHTML = "";
+
+
+          if(item.media_path){
+
+            const {
+              data: publicData
+            } =
+            supabaseClient
+              .storage
+              .from(
+                STORAGE_BUCKET
+              )
+              .getPublicUrl(
+                item.media_path
+              );
+
+
+            imageHTML = `
+
+              <img
+                src="${escapeAttribute(
+                  publicData.publicUrl
+                )}"
+                alt="${escapeAttribute(
+                  item.title || "Happiness"
+                )}"
+              >
+
+            `;
+
+          }
+
+
+          card.innerHTML = `
+
+            ${imageHTML}
+
+            <h3 style="margin-top:15px">
+              ${escapeHTML(
+                item.title || "ছবি"
+              )}
+            </h3>
+
+            ${
+              item.body
+                ?
+                `<p>
+                  ${escapeHTML(item.body)}
+                </p>`
+                :
+                ""
+            }
+
+          `;
+
+
+          gallery.appendChild(
+            card
+          );
+
+        }
+      );
+
     }
 
 
-    /* QUOTES */
+    /*
+    ================================================
+    VIDEOS
+    ================================================
+    */
 
-    const quotes =
-      document.getElementById("quotes-container");
+    const videoData =
+      data.filter(
+        item =>
+          item.type === "video"
+      );
 
-    if(data.quotes && data.quotes.length){
 
-      data.quotes.forEach(text => {
+    if(
+      videoData.length === 0
+    ){
 
-        const card =
-          document.createElement("article");
+      videos.innerHTML =
+        '<div class="empty">এখনও কোনো ভিডিও যোগ করা হয়নি।</div>';
 
-        card.className =
-          "card quote";
+    }else{
 
-        card.innerHTML = `
-          <p>“${text}”</p>
-        `;
+      videoData.forEach(
+        item => {
 
-        quotes.appendChild(card);
+          const card =
+            document.createElement(
+              "article"
+            );
 
-      });
+
+          card.className =
+            "card video";
+
+
+          let videoHTML = "";
+
+
+          if(item.media_path){
+
+            const {
+              data: publicData
+            } =
+            supabaseClient
+              .storage
+              .from(
+                STORAGE_BUCKET
+              )
+              .getPublicUrl(
+                item.media_path
+              );
+
+
+            videoHTML = `
+
+              <video
+                controls
+                preload="metadata"
+                src="${escapeAttribute(
+                  publicData.publicUrl
+                )}">
+              </video>
+
+            `;
+
+          }
+
+
+          card.innerHTML = `
+
+            ${videoHTML}
+
+            <div class="video-content">
+
+              <h3>
+                ${escapeHTML(
+                  item.title || "ভিডিও"
+                )}
+              </h3>
+
+              ${
+                item.body
+                  ?
+                  `<p>
+                    ${escapeHTML(item.body)}
+                  </p>`
+                  :
+                  ""
+              }
+
+            </div>
+
+          `;
+
+
+          videos.appendChild(
+            card
+          );
+
+        }
+      );
 
     }
+
+
+    /*
+    ================================================
+    QUOTES
+    ================================================
+    */
+
+    /*
+      আপাতত Story-এর content-ই quote section-এ
+      দেখানো হবে না।
+
+      ভবিষ্যতে আলাদা Quote system করব।
+    */
+
+    quotes.innerHTML = `
+
+      <div class="card quote">
+
+        <p>
+          “ছোট ছোট ভালো মুহূর্তগুলোই
+          জীবনের সবচেয়ে সুন্দর স্মৃতি হয়ে থাকে।”
+        </p>
+
+      </div>
+
+    `;
 
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "Supabase Error:",
+      error
+    );
 
-    document.getElementById("stories-container").innerHTML =
-      '<div class="empty">Content load করতে সমস্যা হয়েছে।</div>';
+
+    document
+      .getElementById(
+        "stories-container"
+      )
+      .innerHTML = `
+
+        <div class="error">
+
+          Content load করতে সমস্যা হয়েছে।
+
+          <br><br>
+
+          ${escapeHTML(
+            error.message
+          )}
+
+        </div>
+
+      `;
 
   }
 
 }
+
+
+/*
+====================================================
+SECURITY
+====================================================
+*/
+
+function escapeHTML(value){
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function escapeAttribute(value){
+
+  return String(value)
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/*
+====================================================
+START
+====================================================
+*/
 
 loadContent();
 
