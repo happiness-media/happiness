@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Happiness — গল্প, ভিডিও, ছবি এবং সুন্দর মুহূর্তের বাংলা ওয়েবসাইট।">
+  <title>Happiness — গল্প, ভিডিও ও ছবি</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Noto Sans Bengali", "Segoe UI", Arial, sans-serif;
+      background: #fffaf5;
+      color: #29213d;
+      line-height: 1.7;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      width: 100%;
+      display: block;
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: auto;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 250, 245, 0.96);
+      border-bottom: 1px solid #eee4da;
+      backdrop-filter: blur(10px);
+    }
+
+    .navbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: #302447;
+    }
+
+    .logo span {
+      color: #f27b45;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    nav a {
+      font-size: 15px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #f27b45;
+    }
+
+    .menu-btn {
+      display: none;
+      border: none;
+      background: none;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 85px 0 70px;
+      background:
+        radial-gradient(circle at 85% 20%, #ffe2c8 0, transparent 25%),
+        radial-gradient(circle at 10% 80%, #eee5ff 0, transparent 25%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 55px;
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-block;
+      color: #f27b45;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.12;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 span {
+      color: #f27b45;
+    }
+
+    .hero p {
+      color: #716b7b;
+      font-size: 18px;
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #302447;
+      color: white;
+      padding: 13px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      background: #f27b45;
+    }
+
+    .hero-image {
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(48, 36, 71, 0.15);
+    }
+
+    .hero-image img {
+      height: 430px;
+      object-fit: cover;
+    }
+
+    /* Sections */
+    section.content-section {
+      padding: 75px 0;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      margin-bottom: 30px;
+      gap: 20px;
+    }
+
+    .section-title h2 {
+      font-size: 34px;
+    }
+
+    .section-title p {
+      color: #77717e;
+    }
+
+    .see-more {
+      color: #f27b45;
+      font-weight: 700;
+    }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #eee5dc;
+      border-radius: 20px;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 18px 40px rgba(48, 36, 71, 0.1);
+    }
+
+    .card img {
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .category {
+      color: #f27b45;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .card h3 {
+      font-size: 21px;
+      margin: 7px 0;
+    }
+
+    .card p {
+      color: #77717e;
+      font-size: 14px;
+    }
+
+    /* Video */
+    .video-card {
+      position: relative;
+    }
+
+    .play {
+      position: absolute;
+      left: 20px;
+      bottom: 115px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: white;
+      color: #f27b45;
+      font-size: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    /* Gallery */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .gallery-item {
+      border-radius: 16px;
+      overflow: hidden;
+      height: 240px;
+    }
+
+    .gallery-item img {
+      height: 100%;
+      object-fit: cover;
+      transition: 0.4s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.06);
+    }
+
+    /* Newsletter */
+    .newsletter {
+      background: #302447;
+      color: white;
+      border-radius: 30px;
+      padding: 55px;
+      text-align: center;
+    }
+
+    .newsletter h2 {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .newsletter p {
+      color: #ddd7e7;
+      margin-bottom: 25px;
+    }
+
+    .subscribe {
+      display: flex;
+      max-width: 550px;
+      margin: auto;
+      gap: 10px;
+    }
+
+    .subscribe input {
+      flex: 1;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 30px;
+      outline: none;
+    }
+
+    .subscribe button {
+      border: none;
+      border-radius: 30px;
+      padding: 14px 24px;
+      background: #f27b45;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 75px;
+      padding: 45px 0;
+      background: #211a31;
+      color: white;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+    }
+
+    footer h3 {
+      margin-bottom: 12px;
+    }
+
+    footer p,
+    footer a {
+      color: #c9c3d1;
+      font-size: 14px;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 8px;
+    }
+
+    .copyright {
+      margin-top: 35px;
+      padding-top: 20px;
+      border-top: 1px solid #40384e;
+      text-align: center;
+      color: #aaa2b4;
+      font-size: 13px;
+    }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+      nav {
+        display: none;
+        position: absolute;
+        top: 76px;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        background: #fffaf5;
+        flex-direction: column;
+        border-bottom: 1px solid #eee4da;
+      }
+
+      nav.active {
+        display: flex;
+      }
+
+      .menu-btn {
+        display: block;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 55px;
+      }
+
+      .hero-image img {
+        height: 320px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .newsletter {
+        padding: 35px 20px;
+      }
+
+      .subscribe {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container navbar">
+      <a href="#" class="logo">Happiness<span>♥</span></a>
+
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+      <nav id="nav">
+        <a href="#home">হোম</a>
+        <a href="#stories">গল্প</a>
+        <a href="#videos">ভিডিও</a>
+        <a href="#gallery">ছবি</a>
+        <a href="#popular">জনপ্রিয়</a>
+        <a href="#about">আমাদের সম্পর্কে</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+
+        <div>
+          <div class="tag">✦ Happiness-এ স্বাগতম</div>
+
+          <h1>
+            প্রতিদিনের গল্পে
+            <span>খুঁজে নিন আনন্দ</span>
+          </h1>
+
+          <p>
+            সুন্দর গল্প পড়ুন, মন ভালো করা ভিডিও দেখুন,
+            আর ছবির মাধ্যমে ধরে রাখুন জীবনের ছোট ছোট সুন্দর মুহূর্ত।
+          </p>
+
+          <a href="#stories" class="btn">গল্প পড়ুন →</a>
+        </div>
+
+        <div class="hero-image">
+          <img
+            src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=80"
+            alt="সুন্দর প্রকৃতি">
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Stories -->
+    <section class="content-section" id="stories">
+      <div class="container">
+
+        <div class="section-title">
+          <div>
+            <h2>সর্বশেষ গল্প</h2>
+            <p>কিছু গল্প হয়তো আপনার নিজের কথাই বলবে।</p>
+          </div>
+          <a class="see-more" href="#">সব গল্প →</a>
+        </div>
+
+        <div class="cards">
+
+          <article class="card">
+            <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80" alt="গল্প">
+            <div class="card-body">
+              <div class="category">গল্প</div>
+              <h3>একটি ছোট্ট ভালোবাসার গল্প</h3>
+              <p>কখনো কখনো ছোট একটি মুহূর্তই পুরো জীবনকে বদলে দিতে পারে।</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" alt="সমুদ্র">
+            <div class="card-body">
+              <div class="category">অনুভূতি</div>
+              <h3>সমুদ্রের কাছে ফিরে আসা</h3>
+              <p>কিছু জায়গা আমাদের মনে শান্তি ফিরিয়ে দেয়।</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=800&q=80" alt="আনন্দ">
+            <div class="card-body">
+              <div class="category">জীবন</div>
+              <h3>সুখ আসলে কোথায়?</h3>
+              <p>সুখ হয়তো অনেক দূরে নয়, আমাদের প্রতিদিনের জীবনেই আছে।</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Videos -->
+    <section class="content-section" id="videos">
+      <div class="container">
+
+        <div class="section-title">
+          <div>
+            <h2>জনপ্রিয় ভিডিও</h2>
+            <p>মন ভালো করার কিছু ভিডিও।</p>
+          </div>
+          <a class="see-more" href="#">সব ভিডিও →</a>
+        </div>
+
+        <div class="cards">
+
+          <article class="card video-card">
+            <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80" alt="ভিডিও">
+            <div class="play">▶</div>
+            <div class="card-body">
+              <div class="category">ভিডিও</div>
+              <h3>সুন্দর একটি দিনের গল্প</h3>
+              <p>একটি ছোট্ট ভিডিও, একটি সুন্দর অনুভূতি।</p>
+            </div>
+          </article>
+
+          <article class="card video-card">
+            <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80" alt="প্রকৃতি">
+            <div class="play">▶</div>
+            <div class="card-body">
+              <div class="category">প্রকৃতি</div>
+              <h3>প্রকৃতির মাঝে কিছু সময়</h3>
+              <p>ব্যস্ততার মাঝে একটু শান্তির মুহূর্ত।</p>
+            </div>
+          </article>
+
+          <article class="card video-card">
+            <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80" alt="পাহাড়">
+            <div class="play">▶</div>
+            <div class="card-body">
+              <div class="category">ভ্রমণ</div>
+              <h3>পাহাড়ের পথে</h3>
+              <p>চলুন হারিয়ে যাই সবুজ পাহাড়ের মাঝে।</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="content-section" id="gallery">
+      <div class="container">
+
+        <div class="section-title">
+          <div>
+            <h2>ছবির গ্যালারি</h2>
+            <p>কিছু সুন্দর মুহূর্ত একসাথে।</p>
+          </div>
+          <a class="see-more" href="#">সব ছবি →</a>
+        </div>
+
+        <div class="gallery">
+
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=700&q=80" alt="প্রকৃতি">
+          </div>
+
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=700&q=80" alt="সমুদ্র">
+          </div>
+
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=700&q=80" alt="পাহাড়">
+          </div>
+
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=700&q=80" alt="প্রকৃতি">
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular -->
+    <section class="content-section" id="popular">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>জনপ্রিয় কনটেন্ট</h2>
+            <p>আমাদের পাঠকদের পছন্দের কিছু কনটেন্ট।</p>
+          </div>
+        </div>
+
+        <div class="cards">
+
+          <article class="card">
+            <div class="card-body">
+              <div class="category">#১ জনপ্রিয়</div>
+              <h3>জীবন বদলে দেওয়া একটি গল্প</h3>
+              <p>একটি ছোট সিদ্ধান্ত কীভাবে একজন মানুষের জীবন বদলে দিতে পারে।</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <div class="category">#২ জনপ্রিয়</div>
+              <h3>মন ভালো করার ৫টি উপায়</h3>
+              <p>প্রতিদিনের জীবনে আনন্দ খুঁজে পাওয়ার কিছু সহজ উপায়।</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-body">
+              <div class="category">#৩ জনপ্রিয়</div>
+              <h3>এক কাপ চা এবং কিছু স্মৃতি</h3>
+              <p>কিছু স্মৃতি কখনো পুরোনো হয় না।</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="content-section">
+      <div class="container">
+
+        <div class="newsletter">
+          <h2>Happiness-এর সাথে থাকুন ♥</h2>
+          <p>নতুন গল্প, ভিডিও ও সুন্দর কনটেন্টের খবর পেতে সাবস্ক্রাইব করুন।</p>
+
+          <form class="subscribe" onsubmit="subscribeUser(event)">
+            <input type="email" placeholder="আপনার Email" required>
+            <button type="submit">সাবস্ক্রাইব</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="about">
+    <div class="container">
+
+      <div class="footer-grid">
+
+        <div>
+          <h3>Happiness ♥</h3>
+          <p>
+            গল্প, ভিডিও, ছবি এবং সুন্দর মুহূর্তের একটি বাংলা
+            অনলাইন প্ল্যাটফর্ম।
+          </p>
+        </div>
+
+        <div>
+          <h3>দ্রুত লিংক</h3>
+          <div class="footer-links">
+            <a href="#home">হোম</a>
+            <a href="#stories">গল্প</a>
+            <a href="#videos">ভিডিও</a>
+            <a href="#gallery">ছবি</a>
+          </div>
+        </div>
+
+        <div>
+          <h3>যোগাযোগ</h3>
+          <div class="footer-links">
+            <a href="#">Facebook</a>
+            <a href="#">YouTube</a>
+            <a href="#">Email</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="copyright">
+        © 2026 Happiness. All rights reserved.
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("nav").classList.toggle("active");
+    }
+
+    function subscribeUser(event) {
+      event.preventDefault();
+      alert("ধন্যবাদ! সাবস্ক্রাইব করার জন্য। ♥");
+    }
+  </script>
+
+</body>
+</html>
